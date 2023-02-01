@@ -1,0 +1,13 @@
+package emo.microservices.appgateway
+
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient
+
+@SpringBootApplication
+@EnableEurekaClient
+class AppGatewayApplication
+
+fun main(args: Array<String>) {
+    runApplication<AppGatewayApplication>(*args)
+}

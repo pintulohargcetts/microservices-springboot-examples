@@ -1,0 +1,20 @@
+server:
+  port: 9095
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+spring:
+  cloud:
+    consul:
+      port: 8500
+      host: localhost
+      config:
+        enabled: true
+        name: springbootconsulconfig
+  config:
+    import: 'consul:'
+  application:
+    name: springbootconsulconfig

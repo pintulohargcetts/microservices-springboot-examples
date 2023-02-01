@@ -1,0 +1,52 @@
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints: # Expose all webendpoints of actutator
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        registerHealthIndicator: true # So that we can see  status of circuit breakers in health endpoint of http://localhost:9092/actuator/health
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50 # If 50 % of request for userService fails, change the status of circuit to open.
+        minimumNumberOfCalls: 5 # (consider last 5 request )
+        automaticTransitionFromOpenToHalfOpenEnabled: true #  CircuitBreaker will automatically transition from open to half-open state and no call is needed to trigger the transition
+        permittedNumberOfCallsInHalfOpenState: 3 #Configures the number of permitted calls when the CircuitBreaker is half open.
+        slidingWindowSize: 10
+        waitDurationInOpenState: 30000 #https://resilience4j.readme.io/docs/circuitbreaker: waitDurationInOpenState default 60 sec.
+        slidingWindowType: COUNT_BASED #Configures the type of the sliding window which is used to record the outcome of calls when the CircuitBreaker is closed.
+        #lowCallRateThreshold:
+
+server:
+  port: 9092
+spring:
+  zipkin:
+    base-url: http://localhost:9411/
+  application:
+    name: MICROSERVICE-B
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    instance:
+      hostname: localhost
+logging:
+  file: /Users/personal/Desktop/workspace_private/microservicesb.log
+
+##Spring doc, Swagger Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    operationsSorter: method
+    tagsSorter: default

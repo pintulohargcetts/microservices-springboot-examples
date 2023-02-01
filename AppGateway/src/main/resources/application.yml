@@ -1,0 +1,60 @@
+server:
+  port: 9090
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: GATEWAY-SERVICE
+  cloud:
+    gateway:
+      routes:
+        - id: MICROSERVICE-A
+          uri: lb://MICROSERVICE-A
+          predicates:
+            - Path=/users/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: MICROSERVICE-A
+                fallbackuri: forward:/userFallback
+        - id: MICROSERVICE-B
+          uri: lb://MICROSERVICE-B
+          predicates:
+            - Path=/chat/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: MICROSERVICE-B
+                fallbackuri: forward:/chatFallback
+        - id: MICROSERVICE-C
+          uri: lb://MICROSERVICE-C
+          predicates:
+              - Path=/call/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: MICROSERVICE-C
+                fallbackuri: forward:/callFallback
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    instance:
+      hostname: localhost
+
+management:
+  endpoint:
+    web:
+      exposure:
+        include: hystrix.stream
+
+hytrix:
+  command:
+    fallbackCmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
